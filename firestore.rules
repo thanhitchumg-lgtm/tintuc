@@ -1,0 +1,85 @@
+rules_version = '2';
+
+// Luật bảo mật Firestore cho website tin tức.
+// - Khách: chỉ đọc được bài ĐÃ ĐĂNG, menu và banner.
+// - Biên tập viên: viết/sửa bài NHÁP hoặc CHỜ DUYỆT của chính mình, không tự đăng được.
+// - Admin: toàn quyền (bài viết, menu, banner, người dùng).
+// - Chủ web (email bên dưới): luôn là Admin và không ai hạ quyền được.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // >>> Đổi chủ web: sửa email dưới đây (và "ownerEmail" trong config/site.json), rồi bấm Publish. <<<
+    function isOwner() {
+      return signedIn() && request.auth.token.email == 'thanhitc.humg@gmail.com';
+    }
+
+    function profilePath() {
+      return /databases/$(database)/documents/users/$(request.auth.uid);
+    }
+    function role() {
+      return (signedIn() && exists(profilePath())) ? get(profilePath()).data.role : 'none';
+    }
+    function isAdmin() {
+      return isOwner() || role() == 'admin';
+    }
+    function isEditor() {
+      return role() == 'editor';
+    }
+
+    // Người dùng và vai trò
+    match /users/{uid} {
+      allow get: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow list: if isAdmin();
+      allow create: if (isAdmin() && request.resource.data.get('isOwner', false) == false)
+                    || (isOwner() && request.auth.uid == uid && request.resource.data.role == 'admin');
+      allow update: if isOwner()
+                    || (isAdmin()
+                        && resource.data.get('isOwner', false) != true
+                        && request.resource.data.get('isOwner', false) != true);
+      allow delete: if isOwner();
+    }
+
+    match /menus/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /banners/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Mục lục bài đã đăng (khách đọc để thấy bài mới ngay; chỉ Admin ghi)
+    match /meta/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /articles/{id} {
+      allow read: if isAdmin()
+                  || (resource != null && resource.data.status == 'published')
+                  || (isEditor() && resource != null && resource.data.authorUid == request.auth.uid);
+
+      allow create: if isAdmin()
+                    || (isEditor()
+                        && request.resource.data.authorUid == request.auth.uid
+                        && request.resource.data.status in ['draft', 'pending']
+                        && request.resource.data.get('featuredSlot', null) == null);
+
+      allow update: if isAdmin()
+                    || (isEditor()
+                        && resource.data.authorUid == request.auth.uid
+                        && resource.data.status in ['draft', 'pending']
+                        && request.resource.data.authorUid == resource.data.authorUid
+                        && request.resource.data.status in ['draft', 'pending']
+                        && request.resource.data.get('featuredSlot', null) == null);
+
+      allow delete: if isAdmin()
+                    || (isEditor() && resource.data.authorUid == request.auth.uid && resource.data.status == 'draft');
+    }
+  }
+}
