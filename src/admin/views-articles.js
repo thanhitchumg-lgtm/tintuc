@@ -192,7 +192,7 @@ export async function articleFormView(ctx, root, id) {
       <div class="panel"><div class="panel__head"><h2>Ảnh chính</h2></div>
         <div id="hero-box"></div>
         <label class="field"><span>Mô tả ảnh</span><input id="hero-alt" maxlength="200" value="${h(a.heroImage?.alt || '')}"></label>
-        <p class="muted small">Ảnh hiển thị ở trang chủ, danh sách và đầu bài (JPG/PNG/WebP, tối đa 10 MB).</p></div>
+        <p class="muted small">Ảnh hiển thị ở trang chủ và danh sách bài, không hiện trong trang chi tiết. Muốn có ảnh trong bài, hãy chèn bằng nút "Chèn ảnh" (JPG/PNG/WebP, tối đa 10 MB).</p></div>
       ${ctx.isAdmin ? `<div class="panel"><div class="panel__head"><h2>Vị trí nổi bật trang chủ</h2></div>
         <select id="slot"><option value="">Tự động (bài mới nhất xếp trước)</option>${Object.entries(SLOT_LABELS).map(([n, l]) => `<option value="${n}"${Number(a.featuredSlot) === Number(n) ? ' selected' : ''}>${h(l)}</option>`).join('')}</select>
         <p class="muted small" id="slot-note">Không chọn thì bài được xếp theo thời gian đăng, mới nhất trước.</p></div>` : ''}
