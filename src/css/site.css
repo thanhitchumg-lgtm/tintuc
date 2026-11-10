@@ -31,6 +31,10 @@ h1, h2, h3 { margin: 0; line-height: 1.3; }
 .brand:hover { color: inherit; }
 .brand__mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 8px; background: var(--nav); color: var(--accent); font-size: 20px; }
 .topbar__tag { color: var(--muted); font-size: 13px; }
+.topbar__right { display: flex; align-items: center; gap: 14px; }
+.topbar__admin { font-size: 13px; font-weight: 600; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 4px 12px; white-space: nowrap; }
+.topbar__admin:hover { background: var(--accent); color: #fff; }
+.footer__copy a { color: #b9cbd3; text-decoration: underline; }
 
 .nav { background: var(--nav); color: #fff; position: sticky; top: 0; z-index: 50; }
 .nav__inner { display: flex; align-items: stretch; position: relative; min-height: 44px; }
