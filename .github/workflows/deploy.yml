@@ -1,0 +1,49 @@
+name: Dựng web và đưa lên Firebase Hosting
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '*/30 * * * *'   # mỗi 30 phút kiểm tra; chỉ dựng lại khi nội dung đã đổi (bài mới vẫn hiện ngay nhờ mục lục)
+  workflow_dispatch:          # bấm "Run workflow" trên GitHub để cập nhật ngay
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Nội dung có thay đổi so với web đang chạy không?
+        id: check
+        run: node scripts/check-changed.mjs
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - name: Kiểm tra nhanh
+        if: steps.check.outputs.changed == 'true'
+        run: npm test
+
+      - name: Dựng website từ dữ liệu Firestore
+        if: steps.check.outputs.changed == 'true'
+        run: node scripts/build.mjs
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - name: Đưa lên Firebase Hosting
+        if: steps.check.outputs.changed == 'true'
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: webtintuc-59437
+          channelId: live
