@@ -47,7 +47,7 @@ export function footerHtml(ctx) {
   return `<footer class="footer"><div class="container">
   <div class="footer__brand">${h(ctx.site.siteName)}</div>
   <div class="footer__links">${links}</div>
-  <p class="footer__copy">© ${new Date().getFullYear()} ${h(ctx.site.siteName)}. Bảo lưu mọi quyền.</p>
+  <p class="footer__copy">© ${new Date().getFullYear()} ${h(ctx.site.siteName)}. Bảo lưu mọi quyền. · <a href="/admin/" rel="nofollow">Quản trị</a></p>
 </div></footer>`;
 }
 
@@ -78,7 +78,7 @@ ${jsonLd ? `<script type="application/ld+json">${JSON.stringify(jsonLd).replace(
 <body class="${h(bodyClass)}">
 <div class="topbar"><div class="container topbar__inner">
   <a class="brand" href="/"><span class="brand__mark">${h(s.siteName.charAt(0))}</span><span class="brand__name">${h(s.siteName)}</span></a>
-  <span class="topbar__tag">${h(s.tagline)}</span>
+  <span class="topbar__right"><span class="topbar__tag">${h(s.tagline)}</span><a class="topbar__admin" href="/admin/" rel="nofollow">Quản trị</a></span>
 </div></div>
 ${navHtml(ctx, activeId)}
 <main id="app">${body}</main>
@@ -189,9 +189,6 @@ export function articleMain(ctx, a, related = []) {
   const parent = m?.parentId ? ctx.menusById.get(m.parentId) : null;
   const chips = (a.menuIds || []).map((id) => ctx.menusById.get(id)).filter(Boolean)
     .map((x) => `<a href="/${h(x.slug)}/">${h(x.name)}</a>`).join('');
-  const hero = a.heroImage?.url
-    ? `<figure class="article__hero"><img src="${h(cld(a.heroImage.url, 'hero'))}" alt="${h(a.heroImage.alt || a.title)}">${a.heroImage.alt ? `<figcaption>${h(a.heroImage.alt)}</figcaption>` : ''}</figure>`
-    : '';
   const body = sanitizeHtml(a.contentHtml || '').replace(
     /(<img src=")(https:\/\/res\.cloudinary\.com\/[^"]+)(")/g,
     (_, p1, url, p3) => `${p1}${h(cld(url.replace(/&amp;/g, '&'), 'body'))}${p3}`,
@@ -203,7 +200,6 @@ export function articleMain(ctx, a, related = []) {
       <h1 class="article__title">${h(a.title)}</h1>
       <div class="article__meta">${a.authorName ? `<span>${h(a.authorName)}</span> · ` : ''}<time datetime="${h(a.publishedAt || '')}">${h(formatDate(a.publishedAt))}</time></div>
       ${a.summary ? `<p class="article__sapo">${h(a.summary)}</p>` : ''}
-      ${hero}
       <div class="article__body">${body}</div>
       ${chips ? `<div class="chips"><span>Chuyên mục:</span>${chips}</div>` : ''}
     </article>
