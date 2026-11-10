@@ -1,0 +1,21 @@
+{
+  "siteName": "Điểm Tin",
+  "tagline": "Tin tức kinh tế, đời sống, công nghệ",
+  "siteUrl": "https://webtintuc-59437.web.app",
+  "ownerEmail": "thanhitc.humg@gmail.com",
+  "firebase": {
+    "apiKey": "AIzaSyBon5H4DaxUW-INbcd-JAxlUzYwjopb1Nk",
+    "authDomain": "webtintuc-59437.firebaseapp.com",
+    "projectId": "webtintuc-59437",
+    "storageBucket": "webtintuc-59437.firebasestorage.app",
+    "messagingSenderId": "952773726773",
+    "appId": "1:952773726773:web:94810681bf1732a7c7977c"
+  },
+  "cloudinary": {
+    "cloudName": "z8zq9710",
+    "uploadPreset": "webtintuc_upload"
+  },
+  "homeSlots": 8,
+  "pageSize": 20,
+  "githubRepo": "thanhitchumg-lgtm/tintuc"
+}
